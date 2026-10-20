@@ -3,6 +3,7 @@
 import React, {useState, useRef} from 'react'
 
 import {LuckyGrid} from '@lucky-canvas/react'
+import type {LuckyInstance} from '@lucky-canvas/react'
 
 /**
  * 大转盘文档：https://100px.net/docs/grid.html
@@ -31,7 +32,7 @@ export function LuckyGridPage() {
 
     const [defaultStyle] = useState([{background: "#b8c5f2"}])
 
-    const myLucky = useRef()
+    const myLucky = useRef<LuckyInstance>(null)
 
     return <>
         <LuckyGrid
@@ -45,16 +46,16 @@ export function LuckyGridPage() {
             buttons={buttons}
             onStart={() => { // 点击抽奖按钮会触发star回调
 
-                myLucky.current.play()
+                myLucky.current?.play()
                 setTimeout(() => {
                     const index = Math.random() * 6 >> 0
 
-                    myLucky.current.stop(index)
+                    myLucky.current?.stop(index)
                 }, 2500)
             }}
             onEnd={
 
-                prize => {
+                (prize: any) => {
                     alert('恭喜你抽到 ' + prize.fonts[0].text + ' 号奖品')
                 }
             }>

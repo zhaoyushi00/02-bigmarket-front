@@ -1,15 +1,15 @@
 "use client"
 
 import React, {useEffect, useRef, useState} from 'react'
-// @ts-ignore
 import {LuckyWheel} from '@lucky-canvas/react'
+import type {LuckyInstance} from '@lucky-canvas/react'
 
 import {queryRaffleAwardList, randomRaffle} from '@/apis'
 import {RaffleAwardVO} from "@/types/RaffleAwardVO";
 
 export function LuckyWheelPage() {
     const [prizes, setPrizes] = useState([{}])
-    const myLucky = useRef()
+    const myLucky = useRef<LuckyInstance>(null)
 
     const [blocks] = useState([
         {padding: '10px', background: '#869cfa', imgs: [{src: "https://bugstack.cn/images/system/blog-03.png"}]}
@@ -77,21 +77,18 @@ export function LuckyWheelPage() {
             prizes={prizes}
             buttons={buttons}
             onStart={() => {
-                // @ts-ignore
-                myLucky.current.play()
+                myLucky.current?.play()
                 setTimeout(() => {
                     // 抽奖接口
                     randomRaffleHandle().then(prizeIndex => {
-                            // @ts-ignore
-                            myLucky.current.stop(prizeIndex);
+                            myLucky.current?.stop(prizeIndex);
                         }
                     );
 
                 }, 2500)
             }}
             onEnd={
-                // @ts-ignore
-                prize => {
+                (prize: any) => {
                     alert('恭喜你抽到【' + prize.fonts[0].text + '】奖品ID【' + prize.fonts[0].id + '】')
                 }
             }
