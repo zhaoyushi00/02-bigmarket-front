@@ -4,7 +4,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {LuckyWheel} from '@lucky-canvas/react'
 import type {LuckyInstance} from '@lucky-canvas/react'
 
-import {queryRaffleAwardList, randomRaffle} from '@/apis'
+import {queryRaffleAwardList, draw} from '@/apis'
 import {RaffleAwardVO} from "@/types/RaffleAwardVO";
 
 export function LuckyWheelPage() {
@@ -28,8 +28,9 @@ export function LuckyWheelPage() {
     // 查询奖品列表
     const queryRaffleAwardListHandle = async () => {
         const queryParams = new URLSearchParams(window.location.search);
-        const strategyId = Number(queryParams.get('strategyId'));
-        const result = await queryRaffleAwardList(strategyId);
+        const userId = String(queryParams.get('userId'));
+        const activityId = Number(queryParams.get('activityId'));
+        const result = await queryRaffleAwardList(userId, activityId);
         const {code, info, data} = await result.json();
         if (code != "0000") {
             window.alert("获取抽奖奖品列表失败 code:" + code + " info:" + info)
@@ -52,15 +53,21 @@ export function LuckyWheelPage() {
     // 调用随机抽奖
     const randomRaffleHandle = async () => {
         const queryParams = new URLSearchParams(window.location.search);
-        const strategyId = Number(queryParams.get('strategyId'));
-        const result = await randomRaffle(strategyId);
+        const userId = String(queryParams.get('userId'));
+        const activityId = Number(queryParams.get('activityId'));
+        const result = await draw(userId, activityId);
         const {code, info, data} = await result.json();
         if (code != "0000") {
             window.alert("随机抽奖失败 code:" + code + " info:" + info)
             return;
         }
         // 为了方便测试，mock 的接口直接返回 awardIndex 也就是奖品列表中第几个奖品。
-        return data.awardIndex - 1;
+        const awardIndex = data?.awardIndex;
+        // 防御：awardIndex 无效时返回 0（第一个奖品），避免 stop 传入 -1/NaN 导致 onEnd 收到空对象
+        if (!Number.isInteger(awardIndex) || awardIndex < 1) {
+            return 0;
+        }
+        return awardIndex - 1;
     }
 
     useEffect(() => {
@@ -89,7 +96,7 @@ export function LuckyWheelPage() {
             }}
             onEnd={
                 (prize: any) => {
-                    alert('恭喜你抽到【' + prize.fonts[0].text + '】奖品ID【' + prize.fonts[0].id + '】')
+                    alert('恭喜你抽到【' + (prize?.fonts?.[0]?.text ?? '未知奖品') + '】奖品ID【' + (prize?.fonts?.[0]?.id ?? '') + '】')
                 }
             }
         />

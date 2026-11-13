@@ -3,10 +3,10 @@ const apiHostUrl = process.env.NEXT_PUBLIC_API_HOST_URL ? process.env.NEXT_PUBLI
 
 /**
  * 装配抽奖
- * @param strategyId
+ * @param activityId
  */
-export const strategyArmory = (strategyId?: number) => {
-    return fetch(`${apiHostUrl}/api/v1/raffle/strategy_armory?strategyId=${strategyId}`, {
+export const strategyArmory = (activityId?: number) => {
+    return fetch(`${apiHostUrl}/api/v1/raffle/activity/armory?activityId=${activityId}`, {
         method: 'get',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
@@ -16,16 +16,17 @@ export const strategyArmory = (strategyId?: number) => {
 
 /**
  * 查询抽奖奖品列表
- * @param strategyId 策略ID
+ * @param userId 用户ID
+ * @param activityId 活动ID
  */
-export const queryRaffleAwardList = (strategyId: number) => {
+export const queryRaffleAwardList = (userId?: string, activityId?: number) => {
     try {
-        return fetch(`${apiHostUrl}/api/v1/raffle/query_raffle_award_list`, {
+        return fetch(`${apiHostUrl}/api/v1/raffle/strategy/query_raffle_award_list`, {
             method: 'post',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
             },
-            body: JSON.stringify({strategyId: strategyId})
+            body: JSON.stringify({userId: userId, activityId: activityId})
         });
     } catch (error) {
         return fetch("{\n" +
@@ -38,7 +39,8 @@ export const queryRaffleAwardList = (strategyId: number) => {
 
 /**
  * 随机抽奖接口
- * @param strategyId 策略ID
+ * @param userId 用户ID
+ * @param activityId 活动ID
  *
  * {
  * 	"code": "0000",
@@ -50,14 +52,17 @@ export const queryRaffleAwardList = (strategyId: number) => {
  * 	}
  * }
  */
-export const randomRaffle = (strategyId: number) => {
+export const draw = (userId?: string, activityId?: number) => {
     try {
-        return fetch(`${apiHostUrl}/api/v1/raffle/random_raffle`, {
+        return fetch(`${apiHostUrl}/api/v1/raffle/activity/draw`, {
             method: 'post',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
             },
-            body: JSON.stringify({strategyId: strategyId})
+            body: JSON.stringify({
+                userId: userId,
+                activityId: activityId
+            })
         })
     } catch (error) {
         return fetch("{\n" +
